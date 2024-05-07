@@ -6,8 +6,10 @@ class Game {
     this.height = this.canvas.height;
     this.baseHeight = 720;
     this.ratio = this.height / this.baseHeight;
+    this.background = new Background(this);
     this.player = new Player(this);
     this.gravity;
+    this.speed;
 
     this.resize(window.innerWidth, window.innerHeight);
 
@@ -18,7 +20,7 @@ class Game {
     this.canvas.addEventListener("mousedown", (e) => {
       this.player.flap();
     });
-    // kerboard controls
+    // keyboard controls
     window.addEventListener("keydown", (e) => {
       if (e.key === " " || e.key === "Enter") this.player.flap();
     });
@@ -36,11 +38,15 @@ class Game {
     this.ratio = this.height / this.baseHeight;
 
     this.gravity = 0.15 * this.ratio;
+    this.speed = 2 * this.ratio;
+    this.background.resize();
     this.player.resize();
 
     console.log(this.height, this.baseHeight, this.ratio);
   }
   render() {
+    this.background.update();
+    this.background.draw();
     this.player.update();
     this.player.draw();
   }
