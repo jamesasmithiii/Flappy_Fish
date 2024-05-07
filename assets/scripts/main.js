@@ -14,6 +14,18 @@ class Game {
     window.addEventListener("resize", (e) => {
       this.resize(e.currentTarget.innerWidth, e.currentTarget.innerHeight);
     });
+    // mouse controls
+    this.canvas.addEventListener("mousedown", (e) => {
+      this.player.flap();
+    });
+    // kerboard controls
+    window.addEventListener("keydown", (e) => {
+      if (e.key === " " || e.key === "Enter") this.player.flap();
+    });
+    // touch controls
+    this.canvas.addEventListener("touchstart", (e) => {
+      this.player.flap();
+    });
   }
   resize(width, height) {
     this.canvas.width = width;
