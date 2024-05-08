@@ -12,10 +12,17 @@ class Game {
     this.numberOfObstacles = 2;
     this.gravity;
     this.speed;
+    this.minSpeed;
+    this.maxSpeed;
     this.score;
     this.timer;
     this.message1;
     this.message2;
+    this.eventTimer = 0;
+    this.eventInterval = 150;
+    this.eventUpdate = false;
+    this.touchStatusX;
+    this.swipeDistance = 50;
 
     this.resize(window.innerWidth, window.innerHeight);
 
@@ -29,16 +36,24 @@ class Game {
     // keyboard controls
     window.addEventListener("keydown", (e) => {
       if (e.key === " " || e.key === "Enter") this.player.flap();
+      if (e.key === "Shift" || e.key.toLowerCase() === "c")
+        this.player.startCharge();
     });
     // touch controls
     this.canvas.addEventListener("touchstart", (e) => {
       this.player.flap();
+      this.touchStatusX = e.changedTouches[0].pageX;
+    });
+    this.canvas.addEventListener("touchmove", (e) => {
+      if (e.changedTouches[0].pageX - this.touchStatusX > this.swipeDistance) {
+        this.player.startCharge();
+      }
     });
   }
   resize(width, height) {
     this.canvas.width = width;
     this.canvas.height = height;
-    this.ctx.fillStyle = "blue";
+    // this.ctx.fillStyle = "blue";
     this.ctx.font = "15px Bungee";
     this.ctx.textAlign = "right";
     this.ctx.lineWidth = 3;
@@ -49,6 +64,8 @@ class Game {
 
     this.gravity = 0.15 * this.ratio;
     this.speed = 2 * this.ratio;
+    this.minSpeed = this.speed;
+    this.maxSpeed = this.speed * 5;
     this.background.resize();
     this.player.resize();
     this.createObstacles();
@@ -61,6 +78,7 @@ class Game {
   }
   render(deltaTime) {
     if (!this.gameOver) this.timer += deltaTime;
+    this.handlePeriodicEvents(deltaTime);
     this.background.update();
     this.background.draw();
     this.drawStatusText();
@@ -91,6 +109,15 @@ class Game {
 
   formatTimer() {
     return (this.timer * 0.001).toFixed(1);
+  }
+  handlePeriodicEvents(deltaTime) {
+    if (this.eventTimer < this.eventInterval) {
+      this.eventTimer += deltaTime;
+      this.eventUpdate = false;
+    } else {
+      this.eventTimer = this.eventTimer % this.eventInterval;
+      this.eventUpdate = true;
+    }
   }
 
   drawStatusText() {
@@ -124,6 +151,17 @@ class Game {
         "Press 'R' to try again!",
         this.width * 0.5,
         this.height * 0.5
+      );
+    }
+    if (this.player.energy <= 20) this.ctx.fillStyle = "red";
+    else if (this.player.energy >= this.player.maxEnergy)
+      this.ctx.fillStyle = "orangered";
+    for (let i = 0; i < this.player.energy; i++) {
+      this.ctx.fillRect(
+        10,
+        this.height - 10 - this.player.barSize * i,
+        this.player.barSize * 5,
+        this.player.barSize
       );
     }
     this.ctx.restore();
