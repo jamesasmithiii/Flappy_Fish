@@ -29,15 +29,26 @@ class Game {
     window.addEventListener("resize", (e) => {
       this.resize(e.currentTarget.innerWidth, e.currentTarget.innerHeight);
     });
+
     // mouse controls
     this.canvas.addEventListener("mousedown", (e) => {
       this.player.flap();
+    });
+    this.canvas.addEventListener("mouseup", (e) => {
+      this.player.wingsUp();
     });
     // keyboard controls
     window.addEventListener("keydown", (e) => {
       if (e.key === " " || e.key === "Enter") this.player.flap();
       if (e.key === "Shift" || e.key.toLowerCase() === "c")
         this.player.startCharge();
+      if (e.key.toLowerCase() === "r")
+        this.resize(window.innerWidth, window.innerHeight);
+      if (e.key.toLowerCase() === "f") this.toggleFullScreen();
+      if (e.key.toLowerCase() === "d") this.debug = !this.debug;
+    });
+    window.addEventListener("keyup", (e) => {
+      this.player.wingsUp();
     });
     // touch controls
     this.canvas.addEventListener("touchstart", (e) => {
